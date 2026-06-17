@@ -1,26 +1,45 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/brat",
-      "destination": "/api/brat"
+      "src": "api/*.js",
+      "use": "@vercel/node"
     },
     {
-      "source": "/brat/",
-      "destination": "/api/brat"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/brat/?$",
+      "dest": "/api/brat.js"
     },
     {
-      "source": "/brathd",
-      "destination": "/api/brathd"
+      "src": "^/brathd/?$",
+      "dest": "/api/brathd.js"
     },
     {
-      "source": "/brathd/",
-      "destination": "/api/brathd"
+      "src": "^/api/?$",
+      "dest": "/api/index.js"
     },
     {
-      "source": "/api",
-      "destination": "/api"
+      "src": "^/api/(.*)$",
+      "dest": "/api/$1.js"
+    },
+    {
+      "src": "^/$",
+      "dest": "/index.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/index.html"
     }
   ]
 }

@@ -35,9 +35,12 @@
     "webpack-dev-server": "^4.15.0"
   },
   "dependencies": {
+    "emoji-datasource-google": "^16.0.0",
+    "emoji-regex": "^10.6.0",
     "express": "^4.21.2",
     "html2canvas": "^1.4.1",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "twemoji": "^14.0.2"
   },
   "browserslist": [
     "> 1%",

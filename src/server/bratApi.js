@@ -11,6 +11,7 @@ const PADDING = 32;
 const TEXT_AREA = IMAGE_SIZE - PADDING * 2;
 const MIN_FONT_SIZE = 20;
 const FONT_STEP = 5;
+const TEXT_TOP_ADJUST = 22;
 const FONT_PATH = path.join(__dirname, "..", "fonts", "arialnarrow.ttf");
 const LOCAL_SAMSUNG_EMOJI_DIR = path.join(__dirname, "..", "emoji", "samsung");
 const NOTO_EMOJI_BASE_URL = "https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji@main/svg";
@@ -249,7 +250,7 @@ function createRasterSvg(lines, blurAmount, fontSize) {
   const emojiSize = Math.round(fontSize * 0.92);
 
   lines.forEach((line, index) => {
-    const y = PADDING + fontSize + index * lineHeight;
+    const y = PADDING + fontSize + index * lineHeight - TEXT_TOP_ADJUST;
     let x = PADDING;
 
     line.words.forEach((word, wordIndex) => {

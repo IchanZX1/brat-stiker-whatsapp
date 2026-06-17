@@ -6,6 +6,7 @@ const sharp = require("sharp");
 const twemoji = require("twemoji");
 
 const IMAGE_SIZE = 600;
+const BRATVID_IMAGE_SIZE = 704;
 const DEFAULT_FONT_SIZE = 120;
 const PADDING = 32;
 const TEXT_AREA = IMAGE_SIZE - PADDING * 2;
@@ -22,6 +23,9 @@ const fontData = fs.readFileSync(FONT_PATH).toString("base64");
 const emojiCache = new Map();
 const emojiHttpsAgent = new https.Agent({ rejectUnauthorized: false });
 
+const GIF_WORD_DELAY_MS = 500;
+const MAX_BRATVID_WORDS = 40;
+
 const API_TYPES = {
   brat: {
     fontSize: 190,
@@ -32,6 +36,11 @@ const API_TYPES = {
     fontSize: 190,
     friedLevel: 22,
     filename: "brathd.jpg",
+  },
+  bratvid: {
+    fontSize: 190,
+    friedLevel: 99,
+    filename: "bratvid.gif",
   },
 };
 
@@ -395,20 +404,63 @@ async function createEmojiCompositeLayer(layer, blurAmount) {
   };
 }
 
-async function createBratJpgBuffer(text, type) {
-  const config = API_TYPES[type] || API_TYPES.brat;
-  const baseFontSize = config.fontSize || DEFAULT_FONT_SIZE;
-  const normalizedText = String(text || "brat").toLowerCase();
-  const blurAmount = (config.friedLevel / 100) * 3;
+async function renderBratFramePng(normalizedText, baseFontSize, friedLevel) {
+  const blurAmount = (friedLevel / 100) * 3;
   const { fontSize, lines } = await fitTextByFont(normalizedText, baseFontSize);
   const { emojiLayers, svg } = createRasterSvg(lines, blurAmount, fontSize);
   const composites = await Promise.all(
     emojiLayers.map((layer) => createEmojiCompositeLayer(layer, blurAmount)),
   );
 
-  return sharp(Buffer.from(svg))
-    .composite(composites)
-    .jpeg({ quality: 95 })
+  return sharp(Buffer.from(svg)).composite(composites).png().toBuffer();
+}
+
+async function createBratJpgBuffer(text, type) {
+  const config = API_TYPES[type] || API_TYPES.brat;
+  const baseFontSize = config.fontSize || DEFAULT_FONT_SIZE;
+  const normalizedText = String(text || "brat").toLowerCase();
+  const framePng = await renderBratFramePng(
+    normalizedText,
+    baseFontSize,
+    config.friedLevel,
+  );
+
+  return sharp(framePng).jpeg({ quality: 95 }).toBuffer();
+}
+
+function buildCumulativeWordChunks(text) {
+  const words = String(text).split(/\s+/).filter(Boolean).slice(0, MAX_BRATVID_WORDS);
+  if (!words.length) return ["brat"];
+
+  return words.map((_, index) => words.slice(0, index + 1).join(" "));
+}
+
+async function createBratGifBuffer(text, type) {
+  const config = API_TYPES[type] || API_TYPES.bratvid;
+  const baseFontSize = config.fontSize || DEFAULT_FONT_SIZE;
+  const normalizedText = String(text || "brat").toLowerCase();
+  const chunks = buildCumulativeWordChunks(normalizedText);
+
+  const framePngBuffers = await Promise.all(
+    chunks.map(async (chunkText) => {
+      const frame = await renderBratFramePng(
+        chunkText,
+        baseFontSize,
+        config.friedLevel,
+      );
+
+      return sharp(frame)
+        .resize(BRATVID_IMAGE_SIZE, BRATVID_IMAGE_SIZE)
+        .png()
+        .toBuffer();
+    }),
+  );
+
+  return sharp(framePngBuffers, { join: { animated: true } })
+    .gif({
+      delay: framePngBuffers.map(() => GIF_WORD_DELAY_MS),
+      loop: 0,
+    })
     .toBuffer();
 }
 
@@ -423,6 +475,17 @@ async function sendBratImage(req, res, type) {
   res.send(jpgBuffer);
 }
 
+async function sendBratVideo(req, res, type) {
+  const config = API_TYPES[type] || API_TYPES.bratvid;
+  const text = typeof req.query.text === "string" ? req.query.text : "brat";
+  const gifBuffer = await createBratGifBuffer(text, type);
+
+  res.setHeader("Content-Type", "image/gif");
+  res.setHeader("Content-Disposition", `inline; filename="${config.filename}"`);
+  res.setHeader("Cache-Control", "no-store");
+  res.send(gifBuffer);
+}
+
 function asyncRoute(handler) {
   return (req, res, next) => {
     Promise.resolve(handler(req, res, next)).catch(next);
@@ -432,11 +495,13 @@ function asyncRoute(handler) {
 function registerBratApi(app) {
   app.get(["/brat", "/brat/"], asyncRoute((req, res) => sendBratImage(req, res, "brat")));
   app.get(["/brathd", "/brathd/"], asyncRoute((req, res) => sendBratImage(req, res, "brathd")));
+  app.get(["/bratvid", "/bratvid/"], asyncRoute((req, res) => sendBratVideo(req, res, "bratvid")));
   app.get("/api", (req, res) => {
     res.json({
       endpoints: {
         brat: "/brat/?text=your%20text",
         brathd: "/brathd/?text=your%20text",
+        bratvid: "/bratvid/?text=your%20text",
       },
       config: {
         brat: {
@@ -447,6 +512,11 @@ function registerBratApi(app) {
           fontSize: `${API_TYPES.brathd.fontSize}px`,
           friedLevel: `${API_TYPES.brathd.friedLevel}%`,
         },
+        bratvid: {
+          fontSize: `${API_TYPES.bratvid.fontSize}px`,
+          friedLevel: `${API_TYPES.bratvid.friedLevel}%`,
+          wordDelayMs: GIF_WORD_DELAY_MS,
+        },
       },
     });
   });
@@ -454,6 +524,7 @@ function registerBratApi(app) {
 
 module.exports = {
   createBratJpgBuffer,
+  createBratGifBuffer,
   API_TYPES,
   registerBratApi,
 };

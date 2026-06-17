@@ -5,6 +5,7 @@ module.exports = (req, res) => {
     endpoints: {
       brat: "/brat/?text=your%20text",
       brathd: "/brathd/?text=your%20text",
+      bratvid: "/bratvid/?text=your%20text",
     },
     config: {
       brat: {
@@ -14,6 +15,10 @@ module.exports = (req, res) => {
       brathd: {
         fontSize: `${API_TYPES.brathd.fontSize}px`,
         friedLevel: `${API_TYPES.brathd.friedLevel}%`,
+      },
+      bratvid: {
+        fontSize: `${API_TYPES.bratvid.fontSize}px`,
+        friedLevel: `${API_TYPES.bratvid.friedLevel}%`,
       },
     },
   });

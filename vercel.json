@@ -23,6 +23,10 @@
       "dest": "/api/brathd.js"
     },
     {
+      "src": "^/bratvid/?$",
+      "dest": "/api/bratvid.js"
+    },
+    {
       "src": "^/api/?$",
       "dest": "/api/index.js"
     },

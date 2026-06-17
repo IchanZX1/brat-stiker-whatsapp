@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brat Generator - Modern Dark</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="header fade-in">
+      <h1>brat generator</h1>
+      <p>Generator Brat Simple</p>
+    </div>
+
+    <div class="main-container">
+      <div class="canvas-area fade-in">
+        <div class="meme-container" id="memeContainer">
+          <div class="text-overlay" id="textOverlay"></div>
+        </div>
+      </div>
+
+      <div class="controls-panel scale-in">
+        <div class="panel-header">
+          <h2>Controls</h2>
+          <p>Customize your brat creation</p>
+        </div>
+
+        <div class="panel-content">
+          <div class="form-group">
+            <label class="form-label" for="textInput">Text Content</label>
+            <textarea
+              class="text-input"
+              id="textInput"
+              placeholder="Enter your brat text..."
+              rows="4"
+            >
+brat</textarea
+            >
+          </div>
+
+          <div class="form-group">
+            <div class="slider-container">
+              <div class="slider-header">
+                <label class="form-label">Font Size</label>
+                <span class="slider-value" id="fontSizeValue">120px</span>
+              </div>
+              <input
+                type="range"
+                min="40"
+                max="300"
+                value="120"
+                class="slider"
+                id="fontSizeSlider"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="slider-container">
+              <div class="slider-header">
+                <label class="form-label">Fried Level</label>
+                <span class="slider-value" id="friedValue">80%</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="99"
+                value="80"
+                class="slider"
+                id="friedLevel"
+              />
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="downloadImage()">
+              Download
+            </button>
+            <button class="btn btn-secondary" onclick="previewImage()">
+              Preview
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

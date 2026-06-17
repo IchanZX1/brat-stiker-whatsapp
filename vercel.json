@@ -1,0 +1,26 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/brat",
+      "destination": "/api/brat"
+    },
+    {
+      "source": "/brat/",
+      "destination": "/api/brat"
+    },
+    {
+      "source": "/brathd",
+      "destination": "/api/brathd"
+    },
+    {
+      "source": "/brathd/",
+      "destination": "/api/brathd"
+    },
+    {
+      "source": "/api",
+      "destination": "/api"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "brat-generator",
+  "version": "1.0.0",
+  "description": "brat generator with webpack build system",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "clean": "rm -rf dist",
+    "start": "npm run dev",
+    "api": "node server.js"
+  },
+  "keywords": [
+    "brat",
+    "generator",
+    "meme",
+    "webpack"
+  ],
+  "author": "Arifzyn19",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.0",
+    "css-minimizer-webpack-plugin": "^5.0.0",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.7.0",
+    "style-loader": "^3.3.0",
+    "terser-webpack-plugin": "^5.3.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "html2canvas": "^1.4.1",
+    "sharp": "^0.34.5"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
